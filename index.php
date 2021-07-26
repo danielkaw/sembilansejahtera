@@ -1,5 +1,54 @@
+<?php
+error_reporting(E_ERROR | E_PARSE);
+// memulai sesi
+session_start();
+// bahasa default website
+$default_lang = 'bahasa_indonesia';
+// jika user merubah bahasa
+if($_GET['lang']) {
+  // ubah bahasa sesuai keinginan user
+  $_SESSION['lang'] = $_GET['lang'];
+
+  // kembalikan ke halaman index.php
+  header("Location: index.php?page=".$_GET['page']);
+}
+// jika tidak ada bahasa terdeteksi
+if(!$_SESSION['lang']) {
+  // atur bahasa ke bahasa default
+  $_SESSION['lang'] = $default_lang;
+}
+// masukan file bahasa yang sedang aktif
+include $_SESSION['lang'] . '.php';
+
+if (!function_exists('base_url')) {
+    function base_url($atRoot=FALSE, $atCore=FALSE, $parse=FALSE){
+        if (isset($_SERVER['HTTP_HOST'])) {
+            $http = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off' ? 'https' : 'http';
+            $hostname = $_SERVER['HTTP_HOST'];
+            $dir =  str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
+
+            $core = preg_split('@/@', str_replace($_SERVER['DOCUMENT_ROOT'], '', realpath(dirname(__FILE__))), NULL, PREG_SPLIT_NO_EMPTY);
+            $core = $core[0];
+
+            $tmplt = $atRoot ? ($atCore ? "%s://%s/%s/" : "%s://%s/") : ($atCore ? "%s://%s/%s/" : "%s://%s%s");
+            $end = $atRoot ? ($atCore ? $core : $hostname) : ($atCore ? $core : $dir);
+            $base_url = sprintf( $tmplt, $http, $hostname, $end );
+        }
+        else $base_url = 'http://localhost/';
+
+        if ($parse) {
+            $base_url = parse_url($base_url);
+            if (isset($base_url['path'])) if ($base_url['path'] == '/') $base_url['path'] = '';
+        }
+
+        return $base_url;
+    }
+}
+?>
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bahasa_indonesia">
 
 <head>
     <meta charset="UTF-8">
@@ -27,9 +76,16 @@
     <link rel="stylesheet" href="assets/css/agrikon-icons.css">
     <link rel="stylesheet" href="assets/css/nouislider.min.css">
     <link rel="stylesheet" href="assets/css/nouislider.pips.css">
+    <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
 
     <!-- template styles -->
     <link rel="stylesheet" href="assets/css/main.css">
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+            }
+    </style>
 </head>
 
 <body>
@@ -51,7 +107,7 @@
                         <p>Sembilan Sejahtera</p>
                     </div><!-- /.topbar__left -->
                     <div class="topbar__right">
-                        <a href="#"><i class="agrikon-icon-email"></i>info@sembilansejahtera.com</a>
+                        <a href="mailto:info@sembilansejahtera.com"><i class="agrikon-icon-email"></i>info@sembilansejahtera.com</a>
                         <a href="#"><i class="agrikon-icon-clock"></i>Mon - Fri 8:00 - 6:00, Sat-Sun - CLOSED</a>
                     </div><!-- /.topbar__right -->
                 </div><!-- /.container -->
@@ -63,11 +119,11 @@
                         <span class="fa fa-bars mobile-nav__toggler"></span>
                     </div><!-- /.logo-box -->
                     <ul class="main-menu__list">
-                        <li><a href="index.html">Beranda</a></li>
-                        <li><a href="index.html#tentang">Tentang kami</a></li>
-                        <li><a href="index.html#produk">Produk</a></li>
-                        <li><a href="index.html#hubungi">Hubungi</a> </li>
-                            
+                        <li><a href="index.php?page=home#beranda"><?php echo $lang_beranda;?></a></li>
+                        <li><a href="index.php?page=home#produk"><?php echo $lang_produk;?></a></li>
+                        <li><a href="index.php?page=about"><?php echo $lang_tentang_kami;?></a></li>
+                        <li><a href="index.php?page=whyus"><?php echo $lang_mengapa_kami;?></a></li>
+                        <li><a href="index.php?page=home#hubungi"><?php echo $lang_hubungi;?></a> </li>
                     </ul>
                     <!-- /.main-menu__list -->
 
@@ -75,7 +131,7 @@
                         <a href="tel:92-666-888-0000" class="main-header__info-phone">
                             <i class="agrikon-icon-phone-call"></i>
                             <span class="main-header__info-phone-content">
-                                <span class="main-header__info-phone-text">Hubungi di</span>
+                                <span class="main-header__info-phone-text"><?php echo $lang_hubungi;?></span>
                                 <span class="main-header__info-phone-title">+6221 5596 6229</span>
                             </span><!-- /.main-header__info-phone-content -->
                         </a><!-- /.main-header__info-phone -->
@@ -84,74 +140,14 @@
             </nav>
             <!-- /.main-menu -->
         </header><!-- /.main-header -->
-
+       
         <div class="stricky-header stricked-menu main-menu">
             <div class="sticky-header__content"></div><!-- /.sticky-header__content -->
         </div><!-- /.stricky-header -->
-       
 
-
-        <section class="service-details">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="service-sidebar">
-                            <div class="service-sidebar__call">
-                                <div class="service-sidebar__call-bg" style="background-image: url(assets/images/services/service-widget-bg-1.jpg);"></div>
-                                <!-- /.service-sidebar__call-bg -->
-                                <h3>Kami menjual
-                                    produk berkualitas
-                                </h3>
-                            </div><!-- /.service-sidebar__call -->
-                        </div><!-- /.service-sidebar -->
-                    </div><!-- /.col-lg-4 -->
-                    <div class="col-lg-8">
-                        <h2>Mengapa PT Sembilan Sejahtera</h2>
-                        <p>PT. Sembilan Sejahtera adalah perusahaan profesional yang telah berdiri sejak tahun 2013 di DKI Jakarta, Indonesia. Kami berfokus pada 
-                            bidang industri perdagangan makanan beku. Dalam hal ini, kegiatan kami meliputi proses penangkapan, pengolahan, pengemasan, dan pendistribusian.
-                            <br>
-                            <br>
-                            Dengan didukung oleh wilayah Indonesia yang kaya akan hasil bumi seperti pertanian, perikanan, peternakan, dan perkebunan; PT. Sembilan Sejahtera 
-                            berupaya untuk dapat menyediakan dan mendistribusikan hasil bumi tersebut yang dikemas sebagai produk makanan beku dengan 
-                            kualitas terbaik.
-                        </p>
-                        <ul class="service-details__list list-unstyled">
-                            <li>
-                                <i class="agrikon-icon-right-arrow"></i>
-                                <strong>Sumber Hasil Bumi</strong> PT. Sembilan Sejahtera memiliki sumber perolehan hasil bumi yang memadai. Kami bekerja sama dengan berbagai pihak (supplier, RPA, dan nelayan) dari Sabang sampai Merauke.
-                            </li>
-                            <li>
-                                <i class="agrikon-icon-right-arrow"></i>
-                                <strong>Kualitas & Harga</strong> Kualitas dan harga terbaik adalah prioritas yang kami berikan kepada konsumen. PT. Sembilan Sejahtera berupaya untuk menjaga dan menjamin mutu dengan tetap memberikan harga yang terjangkau.
-                            </li>
-                            <li>
-                                <i class="agrikon-icon-right-arrow"></i>
-                                <strong>Sistem & SDM</strong> PT. Sembilan Sejahtera memiliki sistem management yang transparan dan terpercaya. Kami juga didukung oleh SDM yang ahli dan profesional. Kami menjalankan alur operasional sesuai dengan SOP yang ditentukan.
-                            </li>
-
-                            <div class="special-box">Kualitas dan harga terbaik adalah prioritas yang kami berikan kepada konsumen
-                            </div><!-- /.special-box -->
-
-                            <li>
-                                <i class="agrikon-icon-right-arrow"></i>
-                                <strong>Sarana & Armada</strong> PT. Sembilan Sejahtera memiliki beberapa cold storage, air blast freezer, semi contact freezer, dan mesin pendukung lainnya di berbagai daerah. Kami juga memiliki kapal penangkapan ikan sendiri dan beberapa armada lainnya penunjang kegiatan distribusi.
-                            </li>
-                            <li>
-                                <i class="agrikon-icon-right-arrow"></i>
-                                <strong>Pelayanan</strong> PT. Sembilan Sejahtera siap melayani konsumen kami dari tahap pra hingga purna penjualan. Kami selalu berusaha untuk lebih dekat dan cepat tanggap untuk memenuhi kebutuhan konsumen.
-                            </li>
-                            <li>
-                                <i class="agrikon-icon-right-arrow"></i>
-                                <strong>Kredibilitas</strong> PT. Sembilan Sejahtera berkomitmen penuh untuk menjaga kepercayaan yang diberikan oleh konsumen kami. Adapun konsumen loyal kami di antaranya : PT. Agro Boga, PT. Cahaya Abadi, PT. Sufo, dll.
-                            </li>
-                        </ul><!-- /.service-details__list list-unstyled -->
-                        <p>PT. Sembilan Sejahtera memiliki sistem menejemen yang terpercaya, sarana dan prasarana pendukung serta tenaga ahli yang berpengalaman untuk membantu kami mencapai visi dan misi perusahaan.</p>
-                        
-                        
-                    </div><!-- /.col-lg-8 -->
-                </div><!-- /.row -->
-            </div><!-- /.container -->
-        </section><!-- /.service-details -->
+        <div id="content">
+            <?php include "config.php"; // Load file config.php ?>
+        </div>
 
 
         <footer class="site-footer">
@@ -165,35 +161,45 @@
                                 <img src="assets/images/logo-light.png" width="153" alt="">
                             </a>
                             <p>
-                                Menjadi perusahaan penyedia makanan beku yang menjangkau semua lapisan masyarakat
+                                <?php echo $lang_menjadi_perusahaan_penyedia; ?>
                             </p>
-                            <!-- <form action="#" data-url="YOUR_MAILCHIMP_URL" class="mc-form">
-                                <input type="email" name="EMAIL" placeholder="Email Address">
-                                <button type="submit"><i class="agrikon-icon-right-arrow"></i></button>
-                            </form> -->
+                            
+                            <br> 
+                            <p class="footer-widget__title"><?php echo $lang_bahasa; ?></p>
+
+                            <?php 
+                                $url_bahasa = base_url(true, true) . "index.php?lang=bahasa_indonesia";
+                                $url = base_url(true, true) . "index.php?lang=bahasa_inggris";
+
+                                if(isset($_GET['page']) &&  $_GET['page'] != ""){
+                                    $url .= "&page=" . $_GET['page'];
+                                    $url_bahasa .= "&page=" . $_GET['page'];
+                                }
+                            ?>
+                            <a class="footer-widget__title" href="<?php echo $url?>">ENG</a> 
+                            | 
+                            <a class="footer-widget__title" href="<?php echo $url_bahasa?>">IND</a>
+                            
                             <div class="mc-form__response"></div><!-- /.mc-form__response -->
                             <div class="footer__social">
-                                <!-- <a href="#" class="fab fa-facebook-square"></a>
-                                <a href="#" class="fab fa-twitter"></a>
-                                <a href="#" class="fab fa-pinterest-p"></a>
-                                <a href="#" class="fab fa-instagram"></a> -->
+                                
                             </div><!-- /.topbar__social -->
                         </div><!-- /.footer-widget -->
                     </div><!-- /.col-sm-12 col-md-6 col-lg-4 -->
                     <div class="col-sm-12 col-md-6 col-lg-6 col-xl-2">
                         <div class="footer-widget footer-widget__links-widget">
-                            <h3 class="footer-widget__title">Links</h3><!-- /.footer-widget__title -->
+                            <h3 class="footer-widget__title"><?php echo $lang_tautan; ?></h3><!-- /.footer-widget__title -->
                             <ul class="list-unstyled footer-widget__links">
-                                <li><a href="index.html">Beranda</a></li>
-                                <li><a href="index.html#produk">Produk</a></li>
-                                <li><a href="index.htmlwhyus.html">Mengapa Kami</a></li>
-                                <li><a href="index.html#tentang">Tentang Kami</a></li>
+                                <li><a href="index.php?page=home"><?php echo $lang_beranda; ?></a></li>
+                                <li><a href="index.php?page=home#produk"><?php echo $lang_produk; ?></a></li>
+                                <li><a href="index.php?page=home#tentang"><?php echo $lang_tentang_kami; ?></a></li>
+                                <li><a href="index.php?page=whyus"><?php echo $lang_mengapa_kami; ?></a></li>
                             </ul><!-- /.list-unstyled -->
                         </div><!-- /.footer-widget -->
                     </div><!-- /.col-sm-12 col-md-6 col-lg-2 -->
                     
                     <div class="col-sm-12 col-md-6 col-lg-6 col-xl-3">
-                        <h3 class="footer-widget__title">Kontak</h3><!-- /.footer-widget__title -->
+                        <h3 class="footer-widget__title"><?php echo $lang_kontak; ?></h3><!-- /.footer-widget__title -->
                         <ul class="list-unstyled footer-widget__contact">
                             <li>
                                 <i class="agrikon-icon-telephone"></i>
@@ -203,7 +209,7 @@
                                 <i class="fa fa-fax" aria-hidden="true"></i>
                                 <a href="tel:+6221 5596 6229">+6221 5596 6229</a>
                             </li>
-                            <li>
+                            <li style="padding-top: 0;">
                                 <i class="agrikon-icon-email"></i>
                                 <a href="mailto:info@sembilansejahtera.com">info@sembilansejahtera.com</a>
                             </li>
@@ -212,13 +218,14 @@
                     </div><!-- /.col-sm-12 col-md-6 col-lg-3 -->
 
                     <div class="col-sm-12 col-md-6 col-lg-6 col-xl-3">
-                        <h3 class="footer-widget__title">Alamat Kantor</h3><!-- /.footer-widget__title -->
+                        <h3 class="footer-widget__title"><?php echo $lang_alamat; ?></h3><!-- /.footer-widget__title -->
                         <ul class="list-unstyled footer-widget__contact">
                            
                             <li>
                                 <i class="agrikon-icon-pin"></i>
-                                <a href="#">Rukan Eksklusif Bukit Golf Mediterania Block C 27-28, Pantai Indah Kapuk Jakarta Utara 14470
-                                    Indonesia</a>
+                                <a href="#">
+                                    <?php echo $lang_alamat_lengkap; ?>
+                                </a>
                             </li>
                         </ul><!-- /.list-unstyled -->
                     </div><!-- /.col-sm-12 col-md-6 col-lg-3 -->
@@ -228,7 +235,7 @@
         <div class="bottom-footer">
             <div class="container">
               
-                <p> PT Sembilan Sejahtera © Hak Cipta 2021 <a href="https:/lingkarinovasimuda.com" style="text-decoration: none; color: #b5c3be">Lingkar Inovasi Muda</a></p>
+                <p> PT Sembilan Sejahtera © <?php echo $lang_hak_cipta; ?> 2021 <a href="https:/lingkarinovasimuda.com" style="text-decoration: none; color: #b5c3be">Lingkar Inovasi Muda</a></p>
                 <div class="bottom-footer__links">
                     
                 </div><!-- /.bottom-footer__links -->
@@ -267,13 +274,10 @@
             </ul><!-- /.mobile-nav__contact -->
             <div class="mobile-nav__top">
                 <div class="mobile-nav__language">
-                    <img src="assets/images/resources/flag-1-1.jpg" alt="">
-                    <label class="sr-only" for="language-select">select language</label>
-                    <!-- /#language-select.sr-only -->
-                    <select class="selectpicker" id="language-select">
-                        <option value="Indonesia">Indonesia</option>
-                        <option value="english">English</option>
-                    </select>
+                <p class="footer-widget__title"><?php echo $lang_bahasa; ?></p>
+
+                <a class="footer-widget__title" href="?<?php echo $url?>">ENG</a> | 
+                <a class="footer-widget__title" href="?<?php echo $url_bahasa?>">IND</a>
                 </div><!-- /.mobile-nav__language -->
                 
             </div><!-- /.mobile-nav__top -->
@@ -282,8 +286,7 @@
     </div>
     <!-- /.mobile-nav__wrapper -->
 
-
-
+    
     <a href="#" data-target="html" class="scroll-to-target scroll-to-top"><i class="fa fa-angle-up"></i></a>
 
 
@@ -304,6 +307,17 @@
 
     <!-- template js -->
     <script src="assets/js/theme.js"></script>
+
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script type="text/javascript" >
+      $(document).on('click', 'a[href^="#"]', function (event) {
+        event.preventDefault();
+    
+        $('html, body').animate({
+            scrollTop: $($.attr(this, 'href')).offset().top
+        }, 500);
+      });
+    </script>
 </body>
 
 </html>
